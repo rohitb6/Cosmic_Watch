@@ -28,7 +28,10 @@ init_db()
 # Seed sample data if database is empty (demo user only)
 db = SessionLocal()
 try:
-    from app.models.models import User
+    from app.models.models import User, Asteroid
+    from app.utils.sample_data import seed_sample_asteroids
+    
+    # Create demo user if not exists
     existing_user = db.query(User).filter(User.email == "demo@cosmicwatch.io").first()
     if not existing_user:
         from app.core.security import hash_password
@@ -40,6 +43,14 @@ try:
         )
         db.add(demo_user)
         db.commit()
+    
+    # Seed sample asteroids if database is empty
+    asteroid_count = db.query(Asteroid).count()
+    if asteroid_count == 0:
+        print("🌟 Seeding sample asteroid data for demo...")
+        seed_sample_asteroids(db)
+        print("✓ Sample data seeded successfully!")
+        
 finally:
     db.close()
 

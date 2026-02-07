@@ -3,7 +3,6 @@
  */
 import React, { useEffect, useState } from 'react'
 import { useAsteroids } from '@/hooks/useAsteroids.ts'
-import api from '@/utils/api.ts'
 
 interface APIStats {
   total_requests: number
@@ -14,7 +13,7 @@ interface APIStats {
 }
 
 export default function Observatory() {
-  const { asteroids, loading, error, fetchAsteroids } = useAsteroids()
+  const { asteroids, loading, error, fetchAsteroids, syncNasaData } = useAsteroids()
   const [stats, setStats] = useState<APIStats>({
     total_requests: 0,
     last_sync: new Date().toISOString(),
@@ -28,11 +27,20 @@ export default function Observatory() {
 
   useEffect(() => {
     // Load asteroids on page load
-    fetchAsteroids(page, 20)
-    setStats(prev => ({
-      ...prev,
-      total_requests: (prev.total_requests || 0) + 1
-    }))
+    const loadData = async () => {
+      try {
+        await fetchAsteroids(page, 20)
+        setStats(prev => ({
+          ...prev,
+          total_requests: (prev.total_requests || 0) + 1,
+          api_status: 'active'
+        }))
+      } catch (err) {
+        console.error('Failed to load asteroids:', err)
+      }
+    }
+    
+    loadData()
   }, [page])
 
   const handleSyncNASA = async () => {
@@ -40,33 +48,27 @@ export default function Observatory() {
     setSyncMessage('Syncing with NASA...')
     
     try {
-      // Call the sync endpoint
-      const response = await api.post('/neo/sync-nasa', {}, {
-        params: { days_ahead: 7 }
-      })
+      // Call the improve sync function from hook
+      const result = await syncNasaData(7)
       
-      if (response.data.status === 'success') {
-        setSyncMessage(`✓ Synced ${response.data.synced_asteroids} asteroids from NASA!`)
-        setStats(prev => ({
-          ...prev,
-          api_status: 'active',
-          last_sync: new Date().toISOString(),
-          cache_hit_rate: Math.min(95, (prev.cache_hit_rate || 0) + 2)
-        }))
-        
-        // Refetch asteroids
-        await fetchAsteroids(1, 20)
-        setPage(1)
-        
-        setTimeout(() => setSyncMessage(''), 3000)
-      } else {
-        setSyncMessage(`⚠️ ${response.data.message}`)
-      }
-    } catch (err: any) {
-      setSyncMessage(`✗ Sync failed: ${err.response?.data?.detail || err.message}`)
+      setSyncMessage(`✓ Synced ${result.synced_asteroids || 0} asteroids from NASA!`)
       setStats(prev => ({
         ...prev,
-        api_status: 'error'
+        api_status: 'active',
+        last_sync: new Date().toISOString(),
+        cache_hit_rate: Math.min(95, (prev.cache_hit_rate || 0) + 2)
+      }))
+      
+      // Refetch asteroids
+      await fetchAsteroids(1, 20)
+      setPage(1)
+      
+      setTimeout(() => setSyncMessage(''), 3000)
+    } catch (err: any) {
+      setSyncMessage(`✗ Sync failed: ${err.message || 'Unknown error'}`)
+      setStats(prev => ({
+        ...prev,
+        api_status: 'cached'
       }))
     } finally {
       setSyncing(false)

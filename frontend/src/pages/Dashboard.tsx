@@ -1,16 +1,58 @@
 /**
  * Dashboard Page - Mission Control Panel
+ * Real-time asteroid monitoring and threat assessment
  */
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAsteroids } from '@/hooks/useAsteroids.ts'
 import { Link } from 'react-router-dom'
+import apiClient from '@/utils/api'
 
 export default function Dashboard() {
-  const { asteroids, loading, error, getNext72hThreats } = useAsteroids()
+  const { asteroids, loading, error, getNext72hThreats, syncNasaData } = useAsteroids()
+  const [syncing, setSyncing] = useState(false)
+  const [lastSync, setLastSync] = useState<string>('Never')
 
   useEffect(() => {
-    getNext72hThreats()
+    // Initial data fetch
+    const loadData = async () => {
+      // First try to sync new NASA data
+      try {
+        setSyncing(true)
+        await syncNasaData(7)
+        setLastSync(new Date().toLocaleTimeString())
+      } catch (err) {
+        console.log('Auto-sync skipped or failed, loading cached data')
+      } finally {
+        setSyncing(false)
+      }
+
+      // Then load the threats
+      try {
+        await getNext72hThreats()
+      } catch (err) {
+        console.error('Failed to load threats:', err)
+      }
+    }
+
+    loadData()
+
+    // Refresh data every 5 minutes
+    const interval = setInterval(loadData, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
+
+  const handleManualSync = async () => {
+    setSyncing(true)
+    try {
+      await syncNasaData(7)
+      setLastSync(new Date().toLocaleTimeString())
+      await getNext72hThreats()
+    } catch (err) {
+      console.error('Sync failed:', err)
+    } finally {
+      setSyncing(false)
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -22,14 +64,25 @@ export default function Dashboard() {
 
       {/* Alert Banner */}
       <div className="glass-card p-6 rounded-xl border-l-4 border-red-500 bg-red-900/20">
-        <div className="flex items-start gap-4">
-          <span className="text-3xl">⚠️</span>
-          <div>
-            <h3 className="font-semibold text-red-300 mb-1">Next 72 Hours Critical Alert</h3>
-            <p className="text-sm text-gray-400">
-              {asteroids.length} cosmic events require attention. Review threats below.
-            </p>
+        <div className="flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <span className="text-3xl">⚠️</span>
+            <div>
+              <h3 className="font-semibold text-red-300 mb-1">Next 72 Hours Critical Alert</h3>
+              <p className="text-sm text-gray-400">
+                {asteroids.length > 0
+                  ? `${asteroids.length} cosmic events require attention. Review threats below.`
+                  : 'Loading real-time NASA data...'}
+              </p>
+            </div>
           </div>
+          <button
+            onClick={handleManualSync}
+            disabled={syncing || loading}
+            className="px-4 py-2 bg-cyan-500/20 text-cyan-300 rounded-lg hover:bg-cyan-500/30 disabled:opacity-50 transition text-sm"
+          >
+            {syncing ? '⟳ Syncing...' : '🔄 Sync'}
+          </button>
         </div>
       </div>
 
@@ -37,15 +90,28 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Next 72h Threats */}
         <div className="lg:col-span-2 space-y-4">
-          <h2 className="text-2xl font-semibold text-cyan-400 font-heading">Next 72 Hours Threats</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold text-cyan-400 font-heading">Next 72 Hours Threats</h2>
+            <span className="text-xs text-gray-500">Last sync: {lastSync}</span>
+          </div>
 
           {loading ? (
-            <div className="glass-card p-8 rounded-xl flex items-center justify-center">
-              <div className="pulse-glow text-2xl">Loading threats...</div>
+            <div className="glass-card p-12 rounded-xl flex flex-col items-center justify-center gap-4">
+              <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+              <div className="text-center">
+                <p className="text-cyan-300 font-semibold">Loading real-time asteroid data</p>
+                <p className="text-xs text-gray-500 mt-1">Retrieving latest NASA NeoWs API feed...</p>
+              </div>
             </div>
           ) : error ? (
             <div className="glass-card p-6 rounded-xl border border-red-500/50 bg-red-900/20">
-              <p className="text-red-300">{error}</p>
+              <p className="text-red-300 mb-3">{error}</p>
+              <button
+                onClick={handleManualSync}
+                className="px-4 py-2 bg-red-500/20 text-red-300 rounded hover:bg-red-500/30 transition text-sm"
+              >
+                Retry
+              </button>
             </div>
           ) : asteroids.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -55,7 +121,13 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="glass-card p-8 rounded-xl text-center text-gray-400">
-              No significant threats in the next 72 hours.
+              <p className="mb-4">No significant threats in the next 72 hours.</p>
+              <button
+                onClick={handleManualSync}
+                className="px-4 py-2 bg-cyan-500/20 text-cyan-300 rounded hover:bg-cyan-500/30 transition text-sm"
+              >
+                Fetch Data from NASA
+              </button>
             </div>
           )}
         </div>
@@ -64,10 +136,19 @@ export default function Dashboard() {
         <div className="glass-card p-6 rounded-xl">
           <h3 className="text-lg font-semibold text-cyan-400 mb-4">Quick Stats</h3>
           <div className="space-y-3 text-sm">
-            <StatRow label="Critical Threats" value={asteroids.filter((a) => (a.cri_score ?? 0) >= 81).length} />
-            <StatRow label="Monitored Asteroids" value="--" />
-            <StatRow label="Active Alerts" value="--" />
-            <StatRow label="Last Sync" value="Just now" />
+            <StatRow
+              label="Critical Threats"
+              value={asteroids.filter((a) => (a.cri_score ?? 0) >= 81).length}
+            />
+            <StatRow
+              label="High Risk"
+              value={asteroids.filter((a) => (a.cri_score ?? 0) >= 61 && (a.cri_score ?? 0) < 81).length}
+            />
+            <StatRow
+              label="Monitored Asteroids"
+              value={asteroids.length}
+            />
+            <StatRow label="Last Sync" value={lastSync} />
           </div>
         </div>
 
