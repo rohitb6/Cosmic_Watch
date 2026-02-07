@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { useAsteroids } from '@/hooks/useAsteroids.ts'
 import { Link } from 'react-router-dom'
 import apiClient from '@/utils/api'
+import SolarSystem from '@/components/Dashboard/SolarSystem'
 
 export default function Dashboard() {
   const { asteroids, loading, error, getNext72hThreats, syncNasaData } = useAsteroids()
@@ -60,6 +61,11 @@ export default function Dashboard() {
       <div className="space-y-2">
         <h1 className="text-4xl font-bold text-cyan-400 font-heading">Mission Control</h1>
         <p className="text-gray-400">Monitor Near-Earth Objects and assess cosmic threats</p>
+      </div>
+
+      {/* Live Solar System */}
+      <div className="glass-card p-6 rounded-xl border border-cyan-500/30">
+        <SolarSystem />
       </div>
 
       {/* Alert Banner */}
