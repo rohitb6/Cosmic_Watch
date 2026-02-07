@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-3.5-turbo"
     
     # CORS
-    cors_origins: list = ["http://localhost:3000", "http://localhost:5173", "http://localhost:3001"]
+    cors_origins: list = ["http://localhost:3000", "http://localhost:5173", "http://localhost:3001", "http://localhost:3002"]
     
     # Pagination
     default_page_size: int = 20
