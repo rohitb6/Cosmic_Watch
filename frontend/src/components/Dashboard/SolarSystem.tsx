@@ -1,38 +1,14 @@
 /**
- * Live NASA Space Feed Viewer
+ * Live Solar System YouTube Stream
  * 
  * Copyright © 2026 Rohit. Made with love by Rohit.
  * All rights reserved.
  * 
- * Real-time live video from NASA ISS cameras and space feeds
+ * Real-time live video stream of solar system from YouTube
  */
-import React, { useState } from 'react'
-
-type FeedSource = 'iss' | 'nasatv' | 'spacex'
+import React from 'react'
 
 export default function SolarSystem() {
-  const [selectedFeed, setSelectedFeed] = useState<FeedSource>('iss')
-
-  const feeds: Record<FeedSource, { name: string; url: string; description: string }> = {
-    iss: {
-      name: '🛰️ ISS Earth Viewing',
-      url: 'https://www.youtube.com/embed/86YLFOog4GM?autoplay=1',
-      description: 'Live video feed from International Space Station cameras showing Earth'
-    },
-    nasatv: {
-      name: '📡 NASA TV Live',
-      url: 'https://www.youtube.com/embed/21X5lGlDOfg?autoplay=1',
-      description: 'NASA Television channel with live space missions and events'
-    },
-    spacex: {
-      name: '🚀 SpaceX Starlink',
-      url: 'https://www.youtube.com/embed/j82tavqnIMQ?autoplay=1',
-      description: 'SpaceX live launches and space operations feed'
-    }
-  }
-
-  const currentFeed = feeds[selectedFeed]
-
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -40,8 +16,8 @@ export default function SolarSystem() {
         <div className="flex items-center gap-2">
           <div className="text-2xl">🌍</div>
           <div>
-            <h2 className="text-xl font-bold text-cyan-400 font-heading">Live Space Feed</h2>
-            <p className="text-xs text-gray-400">{currentFeed.description}</p>
+            <h2 className="text-xl font-bold text-cyan-400 font-heading">Live Solar System</h2>
+            <p className="text-xs text-gray-400">Real-time solar system visualization stream</p>
           </div>
         </div>
         <div className="text-xs text-green-400 flex items-center gap-1">
@@ -55,8 +31,8 @@ export default function SolarSystem() {
         <iframe
           width="100%"
           height="100%"
-          src={currentFeed.url}
-          title={currentFeed.name}
+          src="https://www.youtube.com/embed/fO9e9jnhYK8?autoplay=1"
+          title="Live Solar System"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -64,29 +40,12 @@ export default function SolarSystem() {
         />
       </div>
 
-      {/* Feed Selection Buttons */}
-      <div className="grid grid-cols-3 gap-3">
-        {(Object.entries(feeds) as [FeedSource, typeof feeds[FeedSource]][]).map(([key, feed]) => (
-          <button
-            key={key}
-            onClick={() => setSelectedFeed(key)}
-            className={`px-4 py-3 rounded-lg font-semibold transition-all text-sm ${
-              selectedFeed === key
-                ? 'bg-cyan-500/40 text-cyan-300 border border-cyan-400'
-                : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-cyan-300'
-            }`}
-          >
-            {feed.name}
-          </button>
-        ))}
-      </div>
-
       {/* Info */}
       <div className="glass-card p-4 rounded-lg bg-cyan-900/20 border border-cyan-500/30 text-xs text-cyan-300">
         <p className="flex items-start gap-2">
           <span>ℹ️</span>
           <span>
-            Watching real-time feeds from NASA and space agencies. ISS orbits Earth every 90 minutes. Video may be unavailable during maintenance or mission changes.
+            Watching live solar system stream. This real-time visualization shows the current positions and movements of celestial bodies.
           </span>
         </p>
       </div>
