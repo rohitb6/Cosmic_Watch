@@ -3,6 +3,7 @@
  */
 import React, { useEffect, useState } from 'react'
 import { useAsteroids } from '@/hooks/useAsteroids.ts'
+import SolarSystem from '@/components/Dashboard/SolarSystem'
 
 interface APIStats {
   total_requests: number
@@ -86,6 +87,11 @@ export default function Observatory() {
       <div className="space-y-2">
         <h1 className="text-4xl font-bold text-cyan-400 font-heading">🔭 Observatory</h1>
         <p className="text-gray-400">Real-time NASA NeoWs API Data Feed</p>
+      </div>
+
+      {/* Live Solar System Video */}
+      <div className="glass-card p-6 rounded-xl border border-cyan-500/30">
+        <SolarSystem />
       </div>
 
       {/* API Status Card */}
