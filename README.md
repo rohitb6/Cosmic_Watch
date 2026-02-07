@@ -404,33 +404,43 @@ The NASA API is limited to 1000 requests/hour. Use the caching layer:
 
 ---
 
-## 📄 License
+## 📄 License & Copyright
 
-MIT License - See [LICENSE](./LICENSE) file for details
+**Copyright © 2026 Rohit. Made with love by Rohit.**
+
+All rights reserved.
+
+### Legal Information
+
+- **License**: See [LICENSE.md](./LICENSE.md) for full license terms
+- **Legal Notice**: See [LEGAL.md](./LEGAL.md) for copyright and trademark claims
+- **Usage Rights**: Attribution required for all uses
+- **Commercial Use**: Requires explicit written permission
 
 ---
 
 ## 🙏 Acknowledgments
 
+- **Creator/Developer**: Rohit
 - **NASA NeoWs API** - Real-time asteroid data
 - **FastAPI** - Modern Python web framework
 - **React** - UI library
 - **PostgreSQL** - Reliable database
 - **Docker** - Container orchestration
+- **OpenAI** - GPT-3.5-turbo for AI chatbot
 
 ---
 
 ## 📧 Contact & Support
 
 - **Issues**: GitHub Issues
-- **Email**: team@cosmic-watch.io
-- **Discord**: https://discord.gg/cosmic-watch
-- **Twitter**: @CosmicWatchIO
+- **Repository**: https://github.com/rohitb6/Cosmic_Watch
+- **Creator**: Rohit
 
 ---
 
-**Last Updated**: February 7, 2026 | v1.0.0
+**Made with ❤️ by Rohit**
 
-**Built for**: Space-Tech Hackathon 2026
+**Last Updated**: February 8, 2026 | v1.0.0
 
 *"Monitoring the cosmos, one asteroid at a time."* 🌌

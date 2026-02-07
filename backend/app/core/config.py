@@ -1,5 +1,10 @@
 """
-Configuration management for Cosmic Watch backend
+Cosmic Watch - Configuration Management
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 from pydantic_settings import BaseSettings
 from typing import Optional

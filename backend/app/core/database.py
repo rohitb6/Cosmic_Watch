@@ -1,5 +1,10 @@
 """
-Database connection and session management
+Cosmic Watch - Database Management
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 from sqlalchemy import create_engine, event
 from sqlalchemy.ext.declarative import declarative_base

@@ -1,3 +1,12 @@
+/**
+ * Cosmic Watch - Real-time Asteroid Monitoring & AI Chatbot
+ * 
+ * Copyright © 2026 Rohit. Made with love by Rohit.
+ * All rights reserved.
+ * 
+ * Repository: https://github.com/rohitb6/Cosmic_Watch
+ */
+
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Layout from './components/Layout/Layout'

@@ -1,5 +1,10 @@
 """
-JWT token handling and password security
+Cosmic Watch - Security & JWT Authentication
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 from datetime import datetime, timedelta, timezone
 from typing import Optional

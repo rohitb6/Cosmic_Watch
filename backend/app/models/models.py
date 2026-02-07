@@ -1,5 +1,10 @@
 """
-SQLAlchemy database models for Cosmic Watch
+Cosmic Watch - Database Models
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 from sqlalchemy import (
     Column, String, Integer, Float, Boolean, DateTime, ForeignKey, 

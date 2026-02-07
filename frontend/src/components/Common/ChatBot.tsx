@@ -1,7 +1,13 @@
 /**
- * AI Chatbot Component - Conversational Interface for Asteroid Monitoring
- * Floating chat widget with full conversation history
+ * Cosmic Watch - AI Chatbot Component
+ * 
+ * Copyright © 2026 Rohit. Made with love by Rohit.
+ * All rights reserved.
+ * 
+ * Floating chat widget with full conversation history and AI responses.
+ * Repository: https://github.com/rohitb6/Cosmic_Watch
  */
+
 import React, { useEffect, useState, useRef } from 'react'
 import api from '@/utils/api.ts'
 

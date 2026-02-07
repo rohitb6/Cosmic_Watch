@@ -1,5 +1,16 @@
 """
+Cosmic Watch - Real-time Asteroid Monitoring & AI Chatbot Platform
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
 Main FastAPI application - Cosmic Watch Backend
+
+This software and its source code are protected by copyright law.
+Unauthorized reproduction, distribution, or use is prohibited.
+For licensing inquiries, contact the copyright holder.
+
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware

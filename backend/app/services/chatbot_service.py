@@ -1,6 +1,11 @@
 """
-AI Chatbot service for Cosmic Watch
-Provides intelligent responses about asteroids and NEO monitoring
+Cosmic Watch - AI Chatbot Service
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
+Provides OpenAI GPT-3.5-turbo powered responses about asteroids and NEO monitoring.
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 from typing import List, Optional
 from datetime import datetime, timezone

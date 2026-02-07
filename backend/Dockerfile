@@ -1,3 +1,8 @@
+# Cosmic Watch - Backend Docker Image
+# Copyright © 2026 Rohit. Made with love by Rohit.
+# All rights reserved.
+# Repository: https://github.com/rohitb6/Cosmic_Watch
+
 # Backend Dockerfile
 FROM python:3.10-slim
 

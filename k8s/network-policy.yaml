@@ -1,3 +1,8 @@
+# Cosmic Watch - Kubernetes Network Policies & Security
+# Copyright © 2026 Rohit. Made with love by Rohit.
+# All rights reserved.
+# Repository: https://github.com/rohitb6/Cosmic_Watch
+
 # Production Network Policy
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy

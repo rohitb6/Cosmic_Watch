@@ -1,5 +1,11 @@
 """
-Asteroid and NEO feed service
+Cosmic Watch - Asteroid & NEO Feed Service
+
+Copyright © 2026 Rohit. Made with love by Rohit.
+All rights reserved.
+
+NASA NeoWs API integration for real-time asteroid data.
+Repository: https://github.com/rohitb6/Cosmic_Watch
 """
 import httpx
 import asyncio

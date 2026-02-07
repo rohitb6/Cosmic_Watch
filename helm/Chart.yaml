@@ -1,3 +1,13 @@
+# Cosmic Watch - Helm Chart
+# Copyright © 2026 Rohit. Made with love by Rohit.
+# All rights reserved.
+# Repository: https://github.com/rohitb6/Cosmic_Watch
+
+# Cosmic Watch - Helm Chart
+# Copyright © 2026 Rohit. Made with love by Rohit.
+# All rights reserved.
+# Repository: https://github.com/rohitb6/Cosmic_Watch
+
 apiVersion: v2
 name: cosmic-watch
 description: A Helm chart for Cosmic Watch - Real-time asteroid monitoring and AI chatbot
