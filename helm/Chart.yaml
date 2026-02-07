@@ -1,0 +1,30 @@
+apiVersion: v2
+name: cosmic-watch
+description: A Helm chart for Cosmic Watch - Real-time asteroid monitoring and AI chatbot
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+
+keywords:
+  - cosmic-watch
+  - asteroids
+  - nasa
+  - ai-chatbot
+
+maintainers:
+  - name: Cosmic Watch Team
+    email: team@cosmic-watch.example.com
+
+home: https://github.com/yourusername/cosmic-watch
+sources:
+  - https://github.com/yourusername/cosmic-watch
+
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled

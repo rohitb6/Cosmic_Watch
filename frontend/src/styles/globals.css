@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #0A0E27;
+  --secondary: #1A1F3A;
+  --accent: #00FFE0;
+  --accent-dark: #00B8A9;
+  --warning: #FF6B35;
+  --danger: #FF1744;
+  --success: #00D084;
+  --text: #E0E0E0;
+  --text-muted: #9E9E9E;
+}
+
+body {
+  @apply bg-gradient-to-br from-gray-950 via-slate-900 to-slate-950;
+  @apply text-gray-100 font-sans;
+  color: var(--text);
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  @apply backdrop-blur-md bg-white/10 border border-white/20 rounded-xl;
+  @apply transition-all duration-300 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-500/20;
+}
+
+.glass-card:hover {
+  @apply translate-y-[-4px] bg-white/15;
+}
+
+/* Neon Glow Effects */
+.neon-glow {
+  @apply shadow-lg shadow-cyan-500/50;
+}
+
+.neon-glow-danger {
+  @apply shadow-lg shadow-red-500/50;
+}
+
+.neon-glow-warning {
+  @apply shadow-lg shadow-amber-500/50;
+}
+
+/* Risk Badge Colors */
+.risk-critical {
+  @apply bg-red-900/30 text-red-300 border border-red-600/50;
+}
+
+.risk-high {
+  @apply bg-orange-900/30 text-orange-300 border border-orange-600/50;
+}
+
+.risk-medium {
+  @apply bg-yellow-900/30 text-yellow-300 border border-yellow-600/50;
+}
+
+.risk-low {
+  @apply bg-green-900/30 text-green-300 border border-green-600/50;
+}
+
+.risk-safe {
+  @apply bg-teal-900/30 text-teal-300 border border-teal-600/50;
+}
+
+/* CRI Progress Ring */
+.cri-ring {
+  transition: stroke-dashoffset 0.35s;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+/* Animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(100px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.orbit {
+  animation: orbit 20s linear infinite;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 224, 0.4);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 224, 0.6);
+}

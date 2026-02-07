@@ -1,0 +1,225 @@
+# Default values for cosmic-watch Helm chart
+
+# Global settings
+global:
+  environment: production
+  domain: cosmic-watch.example.com
+
+# Namespace configuration
+namespace:
+  create: true
+  name: cosmic-watch
+
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  auth:
+    username: cosmicwatch
+    password: changeme
+    database: cosmic_watch_db
+  primary:
+    persistence:
+      size: 10Gi
+  metrics:
+    enabled: false
+
+# Redis Configuration
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      size: 2Gi
+  replica:
+    replicaCount: 1
+
+# Backend Service Configuration
+backend:
+  enabled: true
+  replicaCount: 3
+  image:
+    registry: ghcr.io
+    repository: yourusername/cosmic-watch-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 8000
+  
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  livenessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  
+  readinessProbe:
+    httpGet:
+      path: /health
+      port: 8000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  
+  env:
+    DEBUG: "false"
+    LOG_LEVEL: "info"
+  
+  secrets:
+    DATABASE_URL: ""  # Set via --set or values
+    REDIS_URL: ""
+    SECRET_KEY: ""
+    NASA_API_KEY: ""
+    OPENAI_API_KEY: ""
+
+# Frontend Service Configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    registry: ghcr.io
+    repository: yourusername/cosmic-watch-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 3000
+  
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 75
+  
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 20
+    periodSeconds: 10
+  
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 5
+  
+  env:
+    VITE_API_URL: "https://api.cosmic-watch.example.com"
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  
+  hosts:
+    - host: api.cosmic-watch.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: backend
+          port: 8000
+    - host: cosmic-watch.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+          port: 3000
+  
+  tls:
+    enabled: true
+    issuer: letsencrypt-prod
+    secretName: cosmic-watch-tls
+
+# NetworkPolicy Configuration
+networkPolicy:
+  enabled: true
+  ingress:
+    enabled: true
+  egress:
+    enabled: true
+
+# Resource Quota for namespace
+resourceQuota:
+  enabled: true
+  hard:
+    requests.cpu: "10"
+    requests.memory: "20Gi"
+    limits.cpu: "20"
+    limits.memory: "40Gi"
+    pods: "50"
+
+# RBAC Configuration
+rbac:
+  create: true
+  serviceAccountName: cosmic-watch
+
+# Persistence
+persistence:
+  database:
+    enabled: true
+    size: 10Gi
+    storageClassName: standard
+  
+  cache:
+    enabled: true
+    size: 2Gi
+    storageClassName: standard
+
+# Monitoring
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+  prometheusRule:
+    enabled: false
+
+# Logging
+logging:
+  enabled: false
+  loki:
+    enabled: false
+
+# Backup Configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: 30  # days
+
+# Configuration
+config:
+  logLevel: info
+  corsOrigins:
+    - http://localhost:3000
+    - http://localhost:5173
+    - https://cosmic-watch.example.com
+    - https://api.cosmic-watch.example.com
