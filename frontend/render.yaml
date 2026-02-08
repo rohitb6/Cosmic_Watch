@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cosmic-watch-frontend
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://cosmic-watch-backend.onrender.com/api
+      - key: VITE_APP_NAME
+        value: Cosmic Watch
+      - key: VITE_APP_VERSION
+        value: "1.0.0"

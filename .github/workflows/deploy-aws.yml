@@ -1,0 +1,121 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    env:
+      AWS_REGION: us-east-1
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+      ECR_BACKEND_REPO: cosmic-watch/backend
+      ECR_FRONTEND_REPO: cosmic-watch/frontend
+      BACKEND_IMAGE_TAG: ${{ github.sha }}
+      FRONTEND_IMAGE_TAG: ${{ github.sha }}
+      ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build backend Docker image
+        working-directory: ./backend
+        run: |
+          docker build \
+            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPO }}:${{ env.BACKEND_IMAGE_TAG }} \
+            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPO }}:latest \
+            .
+
+      - name: Build frontend Docker image
+        working-directory: ./frontend
+        run: |
+          docker build \
+            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPO }}:${{ env.FRONTEND_IMAGE_TAG }} \
+            -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPO }}:latest \
+            .
+
+      - name: Push backend image to ECR
+        run: |
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPO }}:${{ env.BACKEND_IMAGE_TAG }}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPO }}:latest
+
+      - name: Push frontend image to ECR
+        run: |
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPO }}:${{ env.FRONTEND_IMAGE_TAG }}
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPO }}:latest
+
+      - name: Update ECS backend service
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ENVIRONMENT }}-cosmic-watch-cluster \
+            --service ${{ env.ENVIRONMENT }}-cosmic-watch-backend \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Update ECS frontend service
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ENVIRONMENT }}-cosmic-watch-cluster \
+            --service ${{ env.ENVIRONMENT }}-cosmic-watch-frontend \
+            --force-new-deployment \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Wait for deployment to complete
+        if: github.ref == 'refs/heads/main'
+        run: |
+          aws ecs wait services-stable \
+            --cluster ${{ env.ENVIRONMENT }}-cosmic-watch-cluster \
+            --services ${{ env.ENVIRONMENT }}-cosmic-watch-backend ${{ env.ENVIRONMENT }}-cosmic-watch-frontend \
+            --region ${{ env.AWS_REGION }}
+
+      - name: Get ALB DNS
+        if: github.ref == 'refs/heads/main'
+        run: |
+          ALB_DNS=$(aws elbv2 describe-load-balancers \
+            --query "LoadBalancers[?LoadBalancerName=='${{ env.ENVIRONMENT }}-cosmic-watch-alb'].DNSName" \
+            --output text \
+            --region ${{ env.AWS_REGION }})
+          echo "ALB_DNS=$ALB_DNS" >> $GITHUB_ENV
+
+      - name: Deployment Summary
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "✅ Deployment Complete"
+          echo "Environment: ${{ env.ENVIRONMENT }}"
+          echo "Backend Image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_BACKEND_REPO }}:${{ env.BACKEND_IMAGE_TAG }}"
+          echo "Frontend Image: ${{ env.ECR_REGISTRY }}/${{ env.ECR_FRONTEND_REPO }}:${{ env.FRONTEND_IMAGE_TAG }}"
+          echo "Application URL: http://${{ env.ALB_DNS }}"
+
+      - name: Send Slack notification
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Cosmic Watch Deployment ${{ job.status }}\nEnvironment: ${{ env.ENVIRONMENT }}'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        continue-on-error: true
